@@ -40,7 +40,10 @@
             (reverse-and-appendo xs-rest (cons xs-first ys) out))])))
 
 (define reverseo (lambda (xs ys) ;; (reverse xs) == ys
-    (reverse-and-concato xs '() ys)))
+    (reverse-and-appendo xs '() ys)))
+
+(define palindromeo (lambda (xs) ;; xs == (reverse xs)
+    (reverseo xs xs)))
 
 (define prefixo (lambda (prefix full)
     (fresh (suffix) (appendo prefix suffix full))))
@@ -103,3 +106,61 @@
             (appendo prefix (cons first suffix) ys)
             (appendo prefix suffix without-first)
             (permutationo rest without-first))])))
+
+
+(define intersperse-helpero (lambda (x ys out)
+    (conde
+        [(== ys '()) (== out '())]
+        [(fresh (first rest small-out)
+            (== ys (cons first rest))
+            (== out (cons x (cons first small-out)))
+            (intersperse-helpero x rest small-out))])))
+
+(define intersperseo (lambda (x ys out)
+    (conde
+        [(== ys '()) (== out '())]
+        [(fresh (first rest out2)
+            (== ys (cons first rest))
+            (== out (cons first out2))
+            (intersperse-helpero x rest out2))])))
+
+(define all-equalo (lambda (xs)
+    (fresh (first second rest)
+        (conde
+            [(== xs '())]
+            [(== xs (cons first '()))]
+            [
+                (== xs (cons first (cons second rest)))
+                (== first second)
+                (all-equalo (cons second rest))]))))
+
+(define all-differento (lambda (xs)
+    (fresh (first second rest)
+        (conde
+            [(== xs '())]
+            [(== xs (cons first '()))]
+            [
+                (== xs (cons first (cons second rest)))
+                (=/= first second)
+                (all-differento (cons first rest))
+                (all-differento (cons second rest))]))))
+
+(define repeato (lambda (x xs) ;; xs == [] || xs == [x] || xs == [x, x] || xs == [x, x, x] ...
+    (conde
+        [(== xs '())]
+        [(fresh (first rest)
+            (== xs (cons first rest))
+            (== x first)
+            (repeato x rest))])))
+
+(define nonemptyo (lambda (xs)
+    (fresh (first rest)
+        (== xs (cons first rest)))))
+
+(define exactly-one-differento (lambda (xs)
+    (fresh (prefix middle suffix x without-middle)
+        (appendo prefix (cons middle suffix) xs)
+        (appendo prefix suffix without-middle)
+        (nonemptyo without-middle)
+        (repeato x without-middle)
+        (=/= middle x))))
