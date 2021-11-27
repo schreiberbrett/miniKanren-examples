@@ -1,4 +1,4 @@
-(load "mk.scm")
+(load "~/miniKanren-with-symbolic-constraints/mk.scm")
 
 (define appendo (lambda (a b out) ;; (append a b) == out
     (conde
@@ -164,3 +164,23 @@
         (nonemptyo without-middle)
         (repeato x without-middle)
         (=/= middle x))))
+
+
+
+
+
+
+(define is-even-length
+  (lambda (xs)
+    (cond
+      [(null? xs) #t]
+      [else (is-odd-length (cdr xs))])))
+
+(define is-odd-length
+  (lambda (xs)
+    (cond
+      [(null? xs) #f]
+      [else (is-even-length xs)])))
+
+
+
