@@ -167,20 +167,47 @@
 
 
 
+;; Note -- this "Venn Diagram" should really be defined on sets.
+(define venn-diagramo (lambda (lefts rights excl-lefts common excl-rights)
+  (fresh (left-first left-rest right-first right-rest) (conde
+    [(== lefts '())
+     (== rights '())
+     
+     (== excl-lefts  '())
+     (== common      '())
+     (== excl-rights '())]
+    
+    [(== lefts  '())
+     (== rights (cons right-first right-rest))
+     
+     (== excl-lefts  '())
+     (== common      '())
+     (== excl-rights rights)]
+     
+     
+    [(== lefts  (cons left-first left-rest))
+     (== rights '())
+     
+     (== excl-lefts lefts)
+     (== common '())
+     (== excl-rights '())]
+     
+    [(fresh (excl-lefts-rec excl-rights-rec common-rec)
 
-
-
-(define is-even-length
-  (lambda (xs)
-    (cond
-      [(null? xs) #t]
-      [else (is-odd-length (cdr xs))])))
-
-(define is-odd-length
-  (lambda (xs)
-    (cond
-      [(null? xs) #f]
-      [else (is-even-length xs)])))
-
+     (==  lefts (cons left-first  left-rest))
+     (== rights (cons right-first right-rest))
+     
+     (conde
+       [(== left-first right-first)
+        (== common (cons left-first common-rec))
+        (== excl-lefts  excl-lefts-rec)
+        (== excl-rights excl-rights-rec)]
+       
+       [(=/= left-first right-first)
+        (== common common-rec)
+        (== excl-lefts (cons left-first excl-lefts-rec))
+        (== excl-rights (cons right-first excl-rights-rec))])
+     
+     (venn-diagramo left-rest right-rest excl-lefts-rec common-rec excl-rights-rec))]))))   
 
 

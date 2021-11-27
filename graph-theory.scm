@@ -52,6 +52,38 @@
 
 		(neighborso u rest-edges rest-neighbors))])))
 
+
+;; Given an element, and a list of pairs,
+;; partition the list of pairs into 4 lists, preserving order,
+;; given that element is in the left, right, both, or neither of each pair.
+(define in-pairso (lambda (x pairs in-both in-l in-r in-neither)
+  (conde
+    [(== pairs '()) (== in-both '()) (== in-l '()) (== in-r '()) (== in-neither '())]
+    
+    [(fresh (l r rest in-both-rec in-l-rec in-r-rec in-neither-rec)
+     (== pairs (cons `(,l ,r) rest))
+     (conde
+       [(==  x l) (==  x r)
+        (== in-both (cons `(,l ,r) in-both-rec))
+        (== in-l in-l-rec) (== in-r in-r-rec) (== in-neither in-neither-rec)]
+       
+       [(==  x l) (=/= x r)
+        (== in-both in-both-rec)
+        (== in-l (cons `(,l ,r) in-l-rec))
+        (== in-r in-r-rec) (== in-neither in-neither-rec)]
+       
+       [(=/= x l) (==  x r)
+        (== in-both in-both-rec) (== in-l in-l-rec)
+        (== in-r (cons `(,l ,r) in-r-rec))
+        (== in-neither in-neither-rec)]
+       
+       [(=/= x l) (=/= x r)
+        (== in-both in-both-rec) (== in-l in-l-rec) (== in-r in-r-rec)
+        (== in-neither (cons `(,l ,r) in-neither-rec))])
+
+     (in-pairso x rest in-both-rec in-l-rec in-r-rec in-neither-rec))])))
+
+
 (define first-stcono
   (lambda (s-list t edges) ;; filter out any seen from edges
     (== s-list (cons s rest)))) ;; TODO
